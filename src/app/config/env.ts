@@ -5,11 +5,12 @@ dotenv.config()
 type EnvConfig = {
     PORT: string,
     DB_URL: string,
-    NODE_ENV: 'development' | 'production'
+    NODE_ENV: 'development' | 'production',
+    BCRYPT_SALT_ROUND: string
 }
 
 const localEnvVariable = (): EnvConfig => {
-    const requireEnvVariable: string[] = ['PORT', 'DB_URL', 'NODE_ENV']
+    const requireEnvVariable: string[] = ['PORT', 'DB_URL', 'NODE_ENV', 'BCRYPT_SALT_ROUND']
 
     requireEnvVariable.forEach(key => {
         if (!process.env[key]) {
@@ -20,7 +21,8 @@ const localEnvVariable = (): EnvConfig => {
     return {
         PORT: process.env.PORT as string,
         DB_URL: process.env.DB_URL as string,
-        NODE_ENV: process.env.NODE_ENV as "development" | "production"
+        NODE_ENV: process.env.NODE_ENV as "development" | "production",
+        BCRYPT_SALT_ROUND: process.env.BCRYPT_SALT_ROUND as string
     }
 
 }
