@@ -16,22 +16,9 @@ const loginUser = async (payload: { email: string, password: string }) => {
         throw new AppError(httpStatus.BAD_REQUEST, 'Incorrect Password')
     }
 
-    const jwtPayload = {
-        userId: isExistUser._id,
-        email: isExistUser.email,
-        role: isExistUser.role
-    }
-
-    const accessToken = creteToken(jwtPayload, envVars.JWT_ACCESS_SECRET, envVars.JWT_ACCESS_EXPIRES)
-    const refreshToken = creteToken(jwtPayload, envVars.JWT_REFRESH_SECRET, envVars.JWT_REFRESH_EXPIRES)
-
     const { password: pass, ...rest } = isExistUser.toObject()
 
-    return {
-        accessToken,
-        refreshToken,
-        user: rest
-    }
+    return rest
 
 }
 
