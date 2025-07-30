@@ -6,7 +6,7 @@ export const createUserValidationSchema = z.object({
     email: z.string().email('Invalid email address'),
     password: z.string('Password is required'),
     phone: z.string().optional(),
-    role: z.enum(Object.values(Role)).default(Role.SENDER),
+    role: z.enum(Object.values(Role)).default(Role.sender),
     isBlocked: z.boolean().default(false),
 })
 

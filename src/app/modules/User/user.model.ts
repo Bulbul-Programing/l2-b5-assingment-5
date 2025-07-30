@@ -10,7 +10,7 @@ const UserSchema: Schema<TUser> = new Schema<TUser>(
         email: { type: String, required: true, unique: true, lowercase: true, trim: true },
         password: { type: String, require: true },
         phone: { type: String },
-        role: { type: String, enum: Object.values(Role), default: Role.SENDER },
+        role: { type: String, enum: Object.values(Role), default: Role.sender },
         isBlocked: { type: Boolean, default: false },
     },
     {

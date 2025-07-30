@@ -1,8 +1,8 @@
 
 export enum Role {
-    ADMIN = "ADMIN",
-    SENDER = "SENDER",
-    RECEIVER = "RECEIVER",
+    admin = "admin",
+    sender = "sender",
+    receiver = "receiver",
 }
 
 export type TUser = {
