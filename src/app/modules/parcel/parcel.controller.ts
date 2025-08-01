@@ -3,11 +3,11 @@ import { catchAsync } from "../../utils/catchAsync"
 import { parcelService } from "./parcel.service"
 import { sendResponse } from "../../utils/sendResponse"
 import httpStatus from 'http-status-codes';
-import { JwtPayload } from "jsonwebtoken";
-import { jwt } from "zod";
+import { AppError } from "../../errorHandler/AppError";
 
 const createParcel = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-    const user = await parcelService.createParcel(req.body)
+
+    const user = await parcelService.createParcel(req.body, req.user)
 
     sendResponse(res, {
         success: true,
@@ -31,17 +31,43 @@ const updateParcel = catchAsync(async (req: Request, res: Response, next: NextFu
         role: jwtUser.role
     }
 
-    const user = await parcelService.updateParcelStatus(payload)
+    const result = await parcelService.updateParcelStatus(payload)
 
     sendResponse(res, {
         success: true,
         statusCode: httpStatus.CREATED,
         message: "Parcel update Successfully",
-        data: {},
+        data: result,
+    })
+})
+
+const receiverIncomingParcel = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const { userId, role } = req.user
+    const result = await parcelService.receiverUserAllParcelInfo(userId, role)
+
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.CREATED,
+        message: "Parcel Retrieve Successfully",
+        data: result
+    })
+})
+
+const statusLog = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const parcelId = req.params.parcelId
+    const result = await parcelService.statusLog(parcelId)
+
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.CREATED,
+        message: "Parcel status log Retrieve Successfully",
+        data: result
     })
 })
 
 export const parcelController = {
     createParcel,
-    updateParcel
+    updateParcel,
+    receiverIncomingParcel,
+    statusLog
 }

@@ -7,6 +7,7 @@ import { TJwtPayload } from "../../interface/jwtPayload";
 import { Role } from "../User/user.interface";
 import { STATUS_FLOW } from "./parcel.utils";
 import { Types } from "mongoose";
+import { JwtPayload } from "jsonwebtoken";
 
 type updateParcelStatusParam = {
     userId: Types.ObjectId,
@@ -17,7 +18,11 @@ type updateParcelStatusParam = {
     note?: string
 }
 
-const createParcel = async (payload: TParcel) => {
+const createParcel = async (payload: TParcel, jwtUser: JwtPayload) => {
+    if (payload.sender !== jwtUser.userId) {
+        throw new AppError(httpStatus.BAD_REQUEST, 'Your are not Authorize!')
+    }
+
     const isExistUser = await UserModel.findById(payload.sender)
     if (!isExistUser) {
         throw new AppError(httpStatus.NOT_FOUND, 'Sender Not found')
@@ -63,10 +68,7 @@ const updateParcelStatus = async (payload: updateParcelStatusParam) => {
         }
     }
 
-
     const allowedStatuses = STATUS_FLOW[parcel.status as keyof typeof STATUS_FLOW];
-
-
 
     if (!allowedStatuses.includes((payload.status))) {
         throw new AppError(httpStatus.NOT_FOUND, `Invalid status transition from ${parcel.status} to ${payload.status}`)
@@ -97,7 +99,36 @@ const updateParcelStatus = async (payload: updateParcelStatusParam) => {
     return result
 }
 
+const receiverUserAllParcelInfo = async (userId: string, userRole: string) => {
+    if (userRole === 'sender') {
+        const result = await ParcelModel.find({ sender: userId })
+        return result
+    }
+    if (userRole === 'receiver') {
+        const result = await ParcelModel.find({ receiver: userId })
+        return result
+    }
+}
+
+const statusLog = async (parcelId: string) => {
+    const parcel = await ParcelModel.findById(parcelId).populate('statusLog.updatedBy', 'name email role note -_id').select('trackingId statusLog status')
+
+    if (!parcel) {
+        throw new AppError(httpStatus.NOT_FOUND, 'Parcel not found')
+    }
+
+    const customizedData = {
+        trackingId: parcel.trackingId,
+        currentStatus: parcel.status,
+        history: parcel?.statusLog
+    }
+
+    return customizedData
+}
+
 export const parcelService = {
     createParcel,
-    updateParcelStatus
+    updateParcelStatus,
+    receiverUserAllParcelInfo,
+    statusLog
 }
