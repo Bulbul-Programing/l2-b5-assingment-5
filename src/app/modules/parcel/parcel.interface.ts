@@ -4,31 +4,30 @@ export type ParcelStatus =
     | 'Requested'
     | 'Approved'
     | 'Dispatched'
-    | 'InTransit'
+    | 'In Transit'
     | 'Delivered'
-    | 'Canceled';
-
-export type ParcelStatusUpdateBy = 'admin' | 'deliveryMan'
+    | 'Cancelled'
+    | 'Blocked'
+    ;
 
 export interface IParcelStatusLog {
     status: ParcelStatus;
     location?: string;
     note?: string;
-    timestamp: string;
-    updatedBy: ParcelStatusUpdateBy;
+    timestamp?: Date;
+    updatedBy: Types.ObjectId;
 }
 
 
 export type TParcel = {
     trackingId?: string;
     sender: Types.ObjectId;
+    senderAddress?: string;
     receiver: Types.ObjectId;
+    receiverAddress?: string;
     weight: number;
     deliveryFee?: number;
-    address: string;
     status?: ParcelStatus;
     isBlocked?: boolean;
     statusLog?: IParcelStatusLog[];
-    createdAt?: string;
-    updatedAt?: string;
 }

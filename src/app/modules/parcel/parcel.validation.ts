@@ -5,7 +5,7 @@ const ParcelStatusEnum = z.enum([
     'Requested',
     'Approved',
     'Dispatched',
-    'InTransit',
+    'In Transit',
     'Delivered',
     'Canceled',
 ]);
@@ -19,12 +19,12 @@ export const ParcelStatusLogSchema = z.object({
 });
 
 export const ParcelBookingSchema = z.object({
-    trackingId: z.string({error : 'Tracking Id is Required'}).optional(),
+    trackingId: z.string({ error: 'Tracking Id is Required' }).optional(),
     sender: z.string(),
     receiver: z.string(),
     weight: z.number(),
     deliveryFee: z.number().optional(),
-    address: z.string(),
+    receiverAddress: z.string(),
     status: ParcelStatusEnum.optional(),
     isBlocked: z.boolean().optional(),
     statusLog: z.array(ParcelStatusLogSchema).optional(),

@@ -1,20 +1,13 @@
 import mongoose, { Schema, Types } from 'mongoose';
 import { TParcel } from './parcel.interface';
 import { createTrackingId } from '../../utils/createTrackingId';
-
-export type ParcelStatus =
-    | 'Requested'
-    | 'Approved'
-    | 'Dispatched'
-    | 'InTransit'
-    | 'Delivered'
-    | 'Canceled';
+import { ref } from 'process';
 
 const ParcelStatusEnum = [
     'Requested',
     'Approved',
     'Dispatched',
-    'InTransit',
+    'In Transit',
     'Delivered',
     'Canceled',
 ] as const;
@@ -26,21 +19,21 @@ const ParcelStatusLogSchema = new Schema(
         status: { type: String, enum: ParcelStatusEnum, required: true },
         location: { type: String },
         note: { type: String },
-        timestamp: { type: String, required: true },
-        updatedBy: { type: String, enum: ParcelStatusUpdateBy }
+        updatedBy: { type: Schema.Types.ObjectId, require: true, ref: 'user' }
     },
-    { _id: false }
+    { _id: false, timestamps: true }
 );
 
 const ParcelSchema = new Schema<TParcel>(
     {
         trackingId: { type: String },
         sender: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+        senderAddress: { type: String},
         receiver: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+        receiverAddress: { type: String},
         weight: { type: Number, required: true },
         deliveryFee: { type: Number },
-        address: { type: String, required: true },
-        status: { type: String, enum: ParcelStatusEnum, default: 'Requested' },
+        status: { type: String, enum: ParcelStatusEnum, default: 'Requested', required: true },
         isBlocked: { type: Boolean, default: false },
         statusLog: { type: [ParcelStatusLogSchema] },
     },
