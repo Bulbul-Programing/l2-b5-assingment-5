@@ -14,6 +14,6 @@ export const createUserValidationSchema = z.object({
 export const updateUserValidationSchema = z.object({
     name: z.string().min(1, 'Name is required').optional(),
     phone: z.string().optional(),
-    role: Object.values(Role),
-    isBlocked: z.boolean().default(false).optional(),
+    role: z.enum(Object.values(Role)).optional(),
+    isBlocked: z.boolean().optional(),
 })

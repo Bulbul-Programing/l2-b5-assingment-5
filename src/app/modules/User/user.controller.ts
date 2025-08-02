@@ -15,6 +15,21 @@ const createUser = catchAsync(async (req: Request, res: Response, next: NextFunc
     })
 })
 
+const updateUser = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const userId = req.params.userId
+    const updateData = req.body
+    const jwtUserInfo = req.user
+    const user = await userService.updateUser(userId, updateData, jwtUserInfo)
+
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.CREATED,
+        message: "User Update Successfully",
+        data: user,
+    })
+})
+
 export const userController = {
-    createUser
+    createUser,
+    updateUser
 }
