@@ -5,7 +5,7 @@ import httpStatus from 'http-status-codes';
 import { ParcelModel } from "./parcel.mode";
 import { TJwtPayload } from "../../interface/jwtPayload";
 import { Role } from "../User/user.interface";
-import { STATUS_FLOW } from "./parcel.utils";
+import { ROLE_ACTIONS, STATUS_FLOW } from "./parcel.utils";
 import { Types } from "mongoose";
 import { JwtPayload } from "jsonwebtoken";
 
@@ -15,7 +15,10 @@ type updateParcelStatusParam = {
     role: Role,
     parcelId: string,
     status: ParcelStatus,
-    note?: string
+    note?: string,
+    isBlocked: boolean,
+    returnReason: string,
+    rescheduledDate: Date
 }
 
 const createParcel = async (payload: TParcel, jwtUser: JwtPayload) => {
@@ -36,7 +39,7 @@ const createParcel = async (payload: TParcel, jwtUser: JwtPayload) => {
     payload.receiverAddress = payload.receiverAddress || isExistReceiver.address
 
     const statusLog: IParcelStatusLog = {
-        status: 'Requested',
+        status: 'requested',
         updatedBy: payload.sender,
     }
     payload.statusLog = [statusLog]
@@ -47,57 +50,68 @@ const createParcel = async (payload: TParcel, jwtUser: JwtPayload) => {
 }
 
 const updateParcelStatus = async (payload: updateParcelStatusParam) => {
+    const status = payload.status.toLowerCase() as ParcelStatus;
+    const parcel = await ParcelModel.findById(payload.parcelId);
 
-    const parcel = await ParcelModel.findById(payload.parcelId)
     if (!parcel) {
-        throw new AppError(httpStatus.NOT_FOUND, 'Parcel Not Found!')
+        throw new AppError(httpStatus.NOT_FOUND, 'Parcel Not Found!');
     }
 
-    if (!parcel.status) {
-        throw new AppError(httpStatus.NOT_FOUND, 'Parcel Status Not Found!')
+    // Verify ownership for sender/receiver actions
+    if (payload.role === 'sender' && !parcel.sender.equals(payload.userId)) {
+        throw new AppError(httpStatus.UNAUTHORIZED, 'Not authorized for this action!');
     }
 
-    if (payload.role === 'sender') {
-        if (!parcel.sender.equals(payload.userId)) {
-            throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized for this action!')
-        }
-    }
-    if (payload.role === 'receiver') {
-        if (!parcel.receiver.equals(payload.userId)) {
-            throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorized for this action')
-        }
+    if (payload.role === 'receiver' && !parcel.receiver.equals(payload.userId)) {
+        throw new AppError(httpStatus.UNAUTHORIZED, 'Not authorized for this action');
     }
 
-    const allowedStatuses = STATUS_FLOW[parcel.status as keyof typeof STATUS_FLOW];
-
-    if (!allowedStatuses.includes((payload.status))) {
-        throw new AppError(httpStatus.NOT_FOUND, `Invalid status transition from ${parcel.status} to ${payload.status}`)
+    // Validate status transition
+    const allowedStatuses = STATUS_FLOW[parcel.status as ParcelStatus];
+    if (!allowedStatuses.includes(status)) {
+        throw new AppError(
+            httpStatus.BAD_REQUEST,
+            `Invalid status transition from ${parcel.status} to ${status}`
+        );
     }
 
-    if (payload.role === 'receiver' && payload.status !== 'Delivered') {
-        throw new AppError(httpStatus.NOT_FOUND, 'Receivers can only mark parcels as Delivered!')
+    // Strict role-based validation
+    if (!ROLE_ACTIONS[payload.role].includes(status)) {
+        throw new AppError(
+            httpStatus.UNAUTHORIZED,
+            `Role ${payload.role} cannot set status to ${status}`
+        );
     }
 
-    if (payload.role === 'sender' && payload.status !== 'Cancelled') {
-        throw new AppError(httpStatus.NOT_FOUND, 'Senders can only cancel parcels!')
-    }
-
-    if (payload.status === 'Delivered') {
-        throw new AppError(httpStatus.NOT_FOUND, 'You can only confirm delivery for your own parcels !')
-    }
-    parcel.statusLog?.push({
-        status: payload.status,
+    // Special field requirements
+    const newStatusLog: IParcelStatusLog = {
+        status,
         updatedBy: payload.userId,
-    })
+        note: payload.note
+    };
 
-    const updatePayload = {
-        status: payload.status,
-        statusLog: parcel.statusLog
+    if (status === 'returned' && !payload.returnReason) {
+        throw new AppError(httpStatus.BAD_REQUEST, 'returnReason is required');
+    }
+    if (status === 'rescheduled' && !payload.rescheduledDate) {
+        throw new AppError(httpStatus.BAD_REQUEST, 'rescheduledDate is required');
     }
 
-    const result = await ParcelModel.findByIdAndUpdate(payload.parcelId, updatePayload)
-    return result
-}
+    if (status === 'returned') newStatusLog.returnReason = payload.returnReason;
+    if (status === 'rescheduled') newStatusLog.rescheduledDate = payload.rescheduledDate;
+
+    // Update parcel
+    parcel.statusLog = parcel.statusLog || [];
+    parcel.statusLog.push(newStatusLog);
+
+    const result = await ParcelModel.findByIdAndUpdate(
+        payload.parcelId,
+        { status, statusLog: parcel.statusLog },
+        { new: true }
+    );
+
+    return result;
+};
 
 const receiverUserAllParcelInfo = async (userId: string, userRole: string) => {
     if (userRole === 'sender') {

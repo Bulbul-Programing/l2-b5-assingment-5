@@ -19,13 +19,16 @@ const createParcel = catchAsync(async (req: Request, res: Response, next: NextFu
 
 const updateParcel = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const parcelId = req.params.parcelId
-    const { status, note } = req.body
+    const { status, note, isBlocked, rescheduledDate, returnReason } = req.body
     const jwtUser = req.user
 
     const payload = {
         parcelId,
         status,
         note,
+        isBlocked,
+        returnReason,
+        rescheduledDate,
         userId: jwtUser.userId,
         email: jwtUser.email,
         role: jwtUser.role

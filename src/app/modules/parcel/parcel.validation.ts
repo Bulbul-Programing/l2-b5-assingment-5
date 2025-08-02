@@ -2,20 +2,23 @@
 import { z } from 'zod';
 
 const ParcelStatusEnum = z.enum([
-    'Requested',
-    'Approved',
-    'Dispatched',
-    'In Transit',
-    'Delivered',
-    'Canceled',
+    'requested',
+    'approved',
+    'dispatched',
+    'in transit',
+    'delivered',
+    'cancelled',
+    'returned',
+    'rescheduled'
 ]);
 
 export const ParcelStatusLogSchema = z.object({
     status: ParcelStatusEnum,
     location: z.string().optional(),
     note: z.string().optional(),
-    timestamp: z.string(),
     updatedBy: z.string(),
+    returnReason: z.string().optional(),
+    rescheduledDate: z.date().optional()
 });
 
 export const ParcelBookingSchema = z.object({
@@ -30,4 +33,12 @@ export const ParcelBookingSchema = z.object({
     statusLog: z.array(ParcelStatusLogSchema).optional(),
     createdAt: z.string().optional(),
     updatedAt: z.string().optional(),
+});
+
+export const updateParcelStatus = z.object({
+    status: ParcelStatusEnum.optional(),
+    note: z.string().optional(),
+    isBlocked: z.boolean().optional(),
+    returnReason: z.string().optional(),
+    rescheduledDate: z.string().optional()
 });
