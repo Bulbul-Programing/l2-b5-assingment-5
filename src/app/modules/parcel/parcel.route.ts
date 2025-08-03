@@ -11,5 +11,6 @@ router.get('/me', checkAuth(Role.receiver, Role.sender), parcelController.receiv
 router.post('/', checkAuth(Role.admin, Role.sender), validateRequest(ParcelBookingSchema), parcelController.createParcel)
 router.patch('/updateStatus/:parcelId', checkAuth(...Object.values(Role)), validateRequest(updateParcelStatus), parcelController.updateParcel)
 router.get('/:parcelId/statusLog', checkAuth(...Object.values(Role)), parcelController.statusLog)
+router.delete('/:parcelId', checkAuth(Role.admin, Role.sender), parcelController.deleteParcel)
 
 export const parcelRouter = router

@@ -31,5 +31,6 @@ export type TParcel = {
   deliveryFee?: number;
   status?: ParcelStatus;
   isBlocked?: boolean;
+  coupon?: string;
   statusLog?: IParcelStatusLog[];
 }

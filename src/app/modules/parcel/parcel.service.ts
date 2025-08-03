@@ -8,6 +8,7 @@ import { Role } from "../User/user.interface";
 import { ROLE_ACTIONS, STATUS_FLOW } from "./parcel.utils";
 import { Types } from "mongoose";
 import { JwtPayload } from "jsonwebtoken";
+import { CouponModel } from "../coupon/coupon.model";
 
 type updateParcelStatusParam = {
     userId: Types.ObjectId,
@@ -22,12 +23,23 @@ type updateParcelStatusParam = {
 }
 
 const createParcel = async (payload: TParcel, jwtUser: JwtPayload) => {
+    payload.deliveryFee = payload.weight * 10
+
     if (payload.sender !== jwtUser.userId) {
         throw new AppError(httpStatus.BAD_REQUEST, 'Your are not Authorize!')
     }
 
-    const isExistUser = await UserModel.findById(payload.sender)
-    if (!isExistUser) {
+    if (payload.coupon) {
+        const getCoupon = await CouponModel.findOne({ code: payload.coupon })
+        if (!getCoupon) {
+            throw new AppError(httpStatus.NOT_FOUND, 'Coupon Not Found!')
+        }
+        const discount = getCoupon.type === 'percentage' ? ((payload.deliveryFee! * getCoupon.value) / 100) : getCoupon.value
+        payload.deliveryFee = payload.deliveryFee! - discount
+    }
+
+    const isExistSender = await UserModel.findById(payload.sender)
+    if (!isExistSender) {
         throw new AppError(httpStatus.NOT_FOUND, 'Sender Not found')
     }
     const isExistReceiver = await UserModel.findById(payload.receiver)
@@ -35,7 +47,8 @@ const createParcel = async (payload: TParcel, jwtUser: JwtPayload) => {
         throw new AppError(httpStatus.NOT_FOUND, 'Receiver Not found')
     }
 
-    payload.senderAddress = payload.senderAddress || isExistUser.address
+    payload.sender = isExistSender._id
+    payload.senderAddress = payload.senderAddress || isExistSender.address
     payload.receiverAddress = payload.receiverAddress || isExistReceiver.address
 
     const statusLog: IParcelStatusLog = {
@@ -126,7 +139,7 @@ const receiverUserAllParcelInfo = async (userId: string, userRole: string) => {
 
 const statusLog = async (parcelId: string) => {
     const parcel = await ParcelModel.findById(parcelId).populate('statusLog.updatedBy', 'name email role note -_id').select('trackingId statusLog status')
-
+    console.log(parcel);
     if (!parcel) {
         throw new AppError(httpStatus.NOT_FOUND, 'Parcel not found')
     }
@@ -140,9 +153,24 @@ const statusLog = async (parcelId: string) => {
     return customizedData
 }
 
+const deleteParcel = async (parcelId: string, jwtUser: JwtPayload) => {
+    const isExistParcel = await ParcelModel.findById(parcelId)
+    if (!isExistParcel) {
+        throw new AppError(httpStatus.NOT_FOUND, 'Parcel Not Found!');
+    }
+
+    if (!isExistParcel.sender.equals(jwtUser.userId) && jwtUser.role !== 'admin') {
+        throw new AppError(httpStatus.BAD_REQUEST, 'You are not authorize for this action');
+    }
+
+    const deleteParcel = await ParcelModel.findByIdAndDelete(parcelId)
+    return deleteParcel
+}
+
 export const parcelService = {
     createParcel,
     updateParcelStatus,
     receiverUserAllParcelInfo,
-    statusLog
+    statusLog,
+    deleteParcel
 }

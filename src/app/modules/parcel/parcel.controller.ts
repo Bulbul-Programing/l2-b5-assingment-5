@@ -68,9 +68,23 @@ const statusLog = catchAsync(async (req: Request, res: Response, next: NextFunct
     })
 })
 
+const deleteParcel = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const parcelId = req.params.parcelId
+    const userInfo = req.user
+    const result = await parcelService.deleteParcel(parcelId, userInfo)
+
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.CREATED,
+        message: "Parcel deleteParcel Successfully",
+        data: result
+    })
+})
+
 export const parcelController = {
     createParcel,
     updateParcel,
     receiverIncomingParcel,
-    statusLog
+    statusLog,
+    deleteParcel
 }

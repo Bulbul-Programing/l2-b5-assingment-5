@@ -27,12 +27,11 @@ export const ParcelBookingSchema = z.object({
     receiver: z.string(),
     weight: z.number(),
     deliveryFee: z.number().optional(),
-    receiverAddress: z.string(),
+    receiverAddress: z.string().optional(),
     status: ParcelStatusEnum.optional(),
     isBlocked: z.boolean().optional(),
     statusLog: z.array(ParcelStatusLogSchema).optional(),
-    createdAt: z.string().optional(),
-    updatedAt: z.string().optional(),
+    coupon: z.string().optional()
 });
 
 export const updateParcelStatus = z.object({

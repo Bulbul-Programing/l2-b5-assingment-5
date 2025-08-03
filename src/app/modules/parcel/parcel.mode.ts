@@ -19,7 +19,7 @@ const ParcelStatusLogSchema = new Schema(
     status: { type: String, enum: ParcelStatusEnum, required: true },
     location: { type: String },
     note: { type: String },
-    updatedBy: { type: Schema.Types.ObjectId, required: true, ref: 'User' },
+    updatedBy: { type: Schema.Types.ObjectId, required: true, ref: 'user' },
     returnReason: { type: String },
     rescheduledDate: { type: Date }
   },
@@ -29,12 +29,13 @@ const ParcelStatusLogSchema = new Schema(
 const ParcelSchema = new Schema<TParcel>(
   {
     trackingId: { type: String, unique: true },
-    sender: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    sender: { type: Schema.Types.ObjectId, ref: 'user', required: true },
     senderAddress: { type: String },
-    receiver: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+    receiver: { type: Schema.Types.ObjectId, ref: 'user', required: true },
     receiverAddress: { type: String },
     weight: { type: Number, required: true },
     deliveryFee: { type: Number },
+    coupon: { type: String, required: false },
     status: { type: String, enum: ParcelStatusEnum, default: 'requested' },
     isBlocked: { type: Boolean, default: false },
     statusLog: { type: [ParcelStatusLogSchema] },
@@ -45,9 +46,6 @@ const ParcelSchema = new Schema<TParcel>(
 ParcelSchema.pre('save', async function (next) {
   if (!this.trackingId) {
     this.trackingId = createTrackingId();
-  }
-  if (!this.deliveryFee) {
-    this.deliveryFee = Number(this.weight) * 8;
   }
   next();
 });
