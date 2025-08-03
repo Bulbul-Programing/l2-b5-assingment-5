@@ -5,7 +5,7 @@ const ParcelStatusEnum = z.enum([
     'requested',
     'approved',
     'dispatched',
-    'in transit',
+    'in-transit',
     'delivered',
     'cancelled',
     'returned',

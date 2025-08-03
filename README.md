@@ -54,4 +54,4 @@ npm run build && npm start
 ```
 
 ### Base URL
-http://localhost:5000/api/v1
+https://flashdrop-one.vercel.app/api/v1
