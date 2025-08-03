@@ -8,6 +8,6 @@ import { couponValidationSchema } from './coupon.validation';
 const router = Router()
 
 router.post('/create', checkAuth(Role.admin), validateRequest(couponValidationSchema), couponController.creteCoupon)
-router.post('/:code', couponController.getSingleCoupon)
+router.get('/:code', couponController.getSingleCoupon)
 
 export const couponRoute = router

@@ -1,0 +1,16 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.parcelRouter = void 0;
+const express_1 = require("express");
+const parcel_controller_1 = require("./parcel.controller");
+const validateRequest_1 = require("../../middlewares/validateRequest");
+const parcel_validation_1 = require("./parcel.validation");
+const user_interface_1 = require("../User/user.interface");
+const checkAuth_1 = require("../../middlewares/checkAuth");
+const router = (0, express_1.Router)();
+router.get('/me', (0, checkAuth_1.checkAuth)(user_interface_1.Role.receiver, user_interface_1.Role.sender), parcel_controller_1.parcelController.receiverIncomingParcel);
+router.post('/', (0, checkAuth_1.checkAuth)(user_interface_1.Role.admin, user_interface_1.Role.sender), (0, validateRequest_1.validateRequest)(parcel_validation_1.ParcelBookingSchema), parcel_controller_1.parcelController.createParcel);
+router.patch('/updateStatus/:parcelId', (0, checkAuth_1.checkAuth)(...Object.values(user_interface_1.Role)), (0, validateRequest_1.validateRequest)(parcel_validation_1.updateParcelStatus), parcel_controller_1.parcelController.updateParcel);
+router.get('/:parcelId/statusLog', (0, checkAuth_1.checkAuth)(...Object.values(user_interface_1.Role)), parcel_controller_1.parcelController.statusLog);
+router.delete('/:parcelId', (0, checkAuth_1.checkAuth)(user_interface_1.Role.admin, user_interface_1.Role.sender), parcel_controller_1.parcelController.deleteParcel);
+exports.parcelRouter = router;
