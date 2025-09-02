@@ -28,6 +28,8 @@ export type TParcel = {
   receiver: Types.ObjectId;
   receiverAddress?: string;
   weight: number;
+  width: number;
+  height: number
   deliveryFee?: number;
   status?: ParcelStatus;
   isBlocked?: boolean;

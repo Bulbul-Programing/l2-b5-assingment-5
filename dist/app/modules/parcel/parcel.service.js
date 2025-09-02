@@ -20,7 +20,9 @@ const parcel_mode_1 = require("./parcel.mode");
 const parcel_utils_1 = require("./parcel.utils");
 const coupon_model_1 = require("../coupon/coupon.model");
 const createParcel = (payload, jwtUser) => __awaiter(void 0, void 0, void 0, function* () {
-    payload.deliveryFee = payload.weight * 10;
+    const volume = payload.height * payload.width;
+    const baseCost = volume * 0.01 + payload.weight * 2;
+    payload.deliveryFee = Math.round(baseCost * 100) / 100;
     if (payload.sender !== jwtUser.userId) {
         throw new AppError_1.AppError(http_status_codes_1.default.BAD_REQUEST, 'Your are not Authorize!');
     }
@@ -97,17 +99,20 @@ const updateParcelStatus = (payload) => __awaiter(void 0, void 0, void 0, functi
 });
 const receiverUserAllParcelInfo = (userId, userRole) => __awaiter(void 0, void 0, void 0, function* () {
     if (userRole === 'sender') {
-        const result = yield parcel_mode_1.ParcelModel.find({ sender: userId });
+        const result = yield parcel_mode_1.ParcelModel.find({ sender: userId }).populate('receiver');
         return result;
     }
     if (userRole === 'receiver') {
-        const result = yield parcel_mode_1.ParcelModel.find({ receiver: userId });
+        const result = yield parcel_mode_1.ParcelModel.find({ receiver: userId }).populate('sender');
         return result;
     }
 });
+const adminGetAllParcel = () => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield parcel_mode_1.ParcelModel.find().populate('sender').populate('receiver');
+    return result;
+});
 const statusLog = (parcelId) => __awaiter(void 0, void 0, void 0, function* () {
-    const parcel = yield parcel_mode_1.ParcelModel.findById(parcelId).populate('statusLog.updatedBy', 'name email role note -_id').select('trackingId statusLog status');
-    console.log(parcel);
+    const parcel = yield parcel_mode_1.ParcelModel.findOne({ trackingId: parcelId }).populate('statusLog.updatedBy', 'name email role note -_id').select('trackingId statusLog status');
     if (!parcel) {
         throw new AppError_1.AppError(http_status_codes_1.default.NOT_FOUND, 'Parcel not found');
     }
@@ -133,6 +138,7 @@ exports.parcelService = {
     createParcel,
     updateParcelStatus,
     receiverUserAllParcelInfo,
+    adminGetAllParcel,
     statusLog,
     deleteParcel
 };

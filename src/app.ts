@@ -3,10 +3,16 @@ import { router } from './app/routes';
 import { globalErrorHandler } from './app/middlewares/globalErrorHandler';
 import cookieParser from 'cookie-parser';
 import { notFound } from './app/middlewares/notFound';
+import cors from 'cors';
 
 const app = express()
 
 app.use(cookieParser())
+app.use(cors({
+    origin: ["http://localhost:5173", "https://flashd-drop-frontend.vercel.app"], // your frontend URL
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+    credentials: true
+}));
 app.use(express.json())
 
 app.use("/api/v1", router)

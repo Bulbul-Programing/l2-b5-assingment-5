@@ -8,6 +8,7 @@ import { Role } from './user.interface';
 const router = Router()
 
 router.post('/register', validateRequest(createUserValidationSchema), userController.createUser)
-router.post('/update/:userId',checkAuth(...Object.values(Role)), validateRequest(updateUserValidationSchema), userController.updateUser )
+router.post('/update/:userId', checkAuth(...Object.values(Role)), validateRequest(updateUserValidationSchema), userController.updateUser)
+router.get('/receiver', checkAuth('admin', 'sender'), userController.getReceiver)
 
 export const UserRoutes = router

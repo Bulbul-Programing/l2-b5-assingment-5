@@ -7,9 +7,10 @@ import { checkAuth } from '../../middlewares/checkAuth';
 
 const router = Router()
 
+router.get('/admin', checkAuth(Role.admin), parcelController.adminGetAllParcel)
 router.get('/me', checkAuth(Role.receiver, Role.sender), parcelController.receiverIncomingParcel)
 router.post('/', checkAuth(Role.admin, Role.sender), validateRequest(ParcelBookingSchema), parcelController.createParcel)
-router.patch('/updateStatus/:parcelId', checkAuth(...Object.values(Role)), validateRequest(updateParcelStatus), parcelController.updateParcel)
+router.patch('/updateStatus/:parcelId', checkAuth(...Object.values(Role)), parcelController.updateParcel)
 router.get('/:parcelId/statusLog', checkAuth(...Object.values(Role)), parcelController.statusLog)
 router.delete('/:parcelId', checkAuth(Role.admin, Role.sender), parcelController.deleteParcel)
 

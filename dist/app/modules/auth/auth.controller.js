@@ -41,6 +41,28 @@ const login = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0,
         },
     });
 }));
+const logout = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    res.clearCookie('accessToken');
+    res.clearCookie('refreshToken');
+    (0, sendResponse_1.sendResponse)(res, {
+        success: true,
+        statusCode: http_status_codes_1.default.ACCEPTED,
+        message: "User Logout Successfully",
+        data: null
+    });
+}));
+const getMe = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const userInfo = req.user;
+    const result = yield auth_service_1.AuthService.getMe(userInfo.email);
+    (0, sendResponse_1.sendResponse)(res, {
+        success: true,
+        statusCode: http_status_codes_1.default.ACCEPTED,
+        message: "User Info Retrieve Successfully",
+        data: result
+    });
+}));
 exports.authController = {
-    login
+    login,
+    logout,
+    getMe
 };

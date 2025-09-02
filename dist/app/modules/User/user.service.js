@@ -38,7 +38,12 @@ const updateUser = (userId, payload, jwtUserInfo) => __awaiter(void 0, void 0, v
     const updateUser = yield user_model_1.UserModel.findByIdAndUpdate(userId, payload, { new: true, runValidators: true });
     return updateUser;
 });
+const getReceiver = () => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield user_model_1.UserModel.find({ role: 'receiver' }).select({ _id: 1, name: 1, phone: 1 });
+    return result;
+});
 exports.userService = {
     userRegister,
-    updateUser
+    updateUser,
+    getReceiver
 };

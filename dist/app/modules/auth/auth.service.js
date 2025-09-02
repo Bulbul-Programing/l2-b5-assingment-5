@@ -40,6 +40,14 @@ const loginUser = (payload) => __awaiter(void 0, void 0, void 0, function* () {
     const _a = isExistUser.toObject(), { password: pass } = _a, rest = __rest(_a, ["password"]);
     return rest;
 });
+const getMe = (payload) => __awaiter(void 0, void 0, void 0, function* () {
+    const isExistUser = yield user_model_1.UserModel.findOne({ email: payload }).select({ password: 0 });
+    if (!isExistUser) {
+        throw new AppError_1.AppError(404, 'User Not Found!');
+    }
+    return isExistUser;
+});
 exports.AuthService = {
-    loginUser
+    loginUser,
+    getMe
 };

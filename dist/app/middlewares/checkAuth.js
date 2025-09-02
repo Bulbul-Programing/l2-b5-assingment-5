@@ -20,7 +20,7 @@ const jwtToken_1 = require("../utils/jwtToken");
 const user_model_1 = require("../modules/User/user.model");
 const checkAuth = (...authRoles) => (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     try {
-        const accessToken = req.headers.authorization;
+        const accessToken = req.cookies.accessToken || req.headers.authorization;
         if (!accessToken) {
             throw new AppError_1.AppError(403, "Token Not found");
         }

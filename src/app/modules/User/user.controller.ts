@@ -29,7 +29,20 @@ const updateUser = catchAsync(async (req: Request, res: Response, next: NextFunc
     })
 })
 
+const getReceiver = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+
+    const result = await userService.getReceiver()
+
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.CREATED,
+        message: "Receiver data retrieve Successfully",
+        data: result,
+    })
+})
+
 export const userController = {
     createUser,
-    updateUser
+    updateUser,
+    getReceiver
 }

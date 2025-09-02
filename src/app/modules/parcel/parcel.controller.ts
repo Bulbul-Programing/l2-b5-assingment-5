@@ -6,8 +6,12 @@ import httpStatus from 'http-status-codes';
 import { AppError } from "../../errorHandler/AppError";
 
 const createParcel = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
-
-    const user = await parcelService.createParcel(req.body, req.user)
+    const senderId = req.user.userId
+    const payload = {
+        ...req.body,
+        sender: senderId
+    }
+    const user = await parcelService.createParcel(payload, req.user)
 
     sendResponse(res, {
         success: true,
@@ -17,7 +21,7 @@ const createParcel = catchAsync(async (req: Request, res: Response, next: NextFu
     })
 })
 
-const updateParcel = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+const updateParcel = catchAsync(async (req: Request, res: Response) => {
     const parcelId = req.params.parcelId
     const { status, note, isBlocked, rescheduledDate, returnReason } = req.body
     const jwtUser = req.user
@@ -56,6 +60,17 @@ const receiverIncomingParcel = catchAsync(async (req: Request, res: Response, ne
     })
 })
 
+const adminGetAllParcel = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
+    const result = await parcelService.adminGetAllParcel()
+
+    sendResponse(res, {
+        success: true,
+        statusCode: httpStatus.CREATED,
+        message: "Parcel Retrieve Successfully",
+        data: result
+    })
+})
+
 const statusLog = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
     const parcelId = req.params.parcelId
     const result = await parcelService.statusLog(parcelId)
@@ -85,6 +100,7 @@ export const parcelController = {
     createParcel,
     updateParcel,
     receiverIncomingParcel,
+    adminGetAllParcel,
     statusLog,
     deleteParcel
 }

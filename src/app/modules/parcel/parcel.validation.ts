@@ -23,9 +23,11 @@ export const ParcelStatusLogSchema = z.object({
 
 export const ParcelBookingSchema = z.object({
     trackingId: z.string({ error: 'Tracking Id is Required' }).optional(),
-    sender: z.string(),
+    sender: z.string().optional(),
     receiver: z.string(),
-    weight: z.number(),
+    height: z.number({ message: 'Height is required' }).min(1, { message: 'Height must be greater than 0' }),
+    width: z.number({ message: 'Width is required' }).min(1, { message: 'Width must be greater than 0' }),
+    weight: z.number({ message: 'weight is required' }).min(1, { message: 'weight must be greater than 0' }),
     deliveryFee: z.number().optional(),
     receiverAddress: z.string().optional(),
     status: ParcelStatusEnum.optional(),

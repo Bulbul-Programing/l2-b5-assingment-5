@@ -10,4 +10,5 @@ const user_interface_1 = require("./user.interface");
 const router = (0, express_1.Router)();
 router.post('/register', (0, validateRequest_1.validateRequest)(user_validation_1.createUserValidationSchema), user_controller_1.userController.createUser);
 router.post('/update/:userId', (0, checkAuth_1.checkAuth)(...Object.values(user_interface_1.Role)), (0, validateRequest_1.validateRequest)(user_validation_1.updateUserValidationSchema), user_controller_1.userController.updateUser);
+router.get('/receiver', (0, checkAuth_1.checkAuth)('admin', 'sender'), user_controller_1.userController.getReceiver);
 exports.UserRoutes = router;

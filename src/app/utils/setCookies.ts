@@ -10,14 +10,14 @@ export const setCookies = (res: Response, token: AuthToken) => {
     if (token.accessToken) {
         res.cookie('accessToken', token.accessToken, {
             httpOnly: true,
-            secure: envVars.NODE_ENV === 'production',
+            secure: true,
             sameSite: "none"
         })
     }
     if (token.refreshToken) {
         res.cookie('refreshToken', token.refreshToken, {
             httpOnly: true,
-            secure: envVars.NODE_ENV === 'production',
+            secure: true,
             sameSite: "none"
         })
     }

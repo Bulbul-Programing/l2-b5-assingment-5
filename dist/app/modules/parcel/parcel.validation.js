@@ -22,9 +22,11 @@ exports.ParcelStatusLogSchema = zod_1.z.object({
 });
 exports.ParcelBookingSchema = zod_1.z.object({
     trackingId: zod_1.z.string({ error: 'Tracking Id is Required' }).optional(),
-    sender: zod_1.z.string(),
+    sender: zod_1.z.string().optional(),
     receiver: zod_1.z.string(),
-    weight: zod_1.z.number(),
+    height: zod_1.z.number({ message: 'Height is required' }).min(1, { message: 'Height must be greater than 0' }),
+    width: zod_1.z.number({ message: 'Width is required' }).min(1, { message: 'Width must be greater than 0' }),
+    weight: zod_1.z.number({ message: 'weight is required' }).min(1, { message: 'weight must be greater than 0' }),
     deliveryFee: zod_1.z.number().optional(),
     receiverAddress: zod_1.z.string().optional(),
     status: ParcelStatusEnum.optional(),

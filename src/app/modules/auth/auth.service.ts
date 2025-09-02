@@ -22,7 +22,17 @@ const loginUser = async (payload: { email: string, password: string }) => {
 
 }
 
+const getMe = async (payload: string) => {
+    const isExistUser = await UserModel.findOne({ email: payload }).select({ password: 0 })
+
+    if (!isExistUser) {
+        throw new AppError(404, 'User Not Found!')
+    }
+
+    return isExistUser
+}
 
 export const AuthService = {
-    loginUser
+    loginUser,
+    getMe
 }

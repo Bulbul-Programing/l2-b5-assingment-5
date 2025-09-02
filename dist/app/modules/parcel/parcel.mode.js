@@ -71,6 +71,8 @@ const ParcelSchema = new mongoose_1.Schema({
     receiver: { type: mongoose_1.Schema.Types.ObjectId, ref: 'user', required: true },
     receiverAddress: { type: String },
     weight: { type: Number, required: true },
+    height: { type: Number, required: true },
+    width: { type: Number, required: true },
     deliveryFee: { type: Number },
     coupon: { type: String, required: false },
     status: { type: String, enum: ParcelStatusEnum, default: 'requested' },

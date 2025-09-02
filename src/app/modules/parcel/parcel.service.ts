@@ -23,7 +23,9 @@ type updateParcelStatusParam = {
 }
 
 const createParcel = async (payload: TParcel, jwtUser: JwtPayload) => {
-    payload.deliveryFee = payload.weight * 10
+    const volume = payload.height * payload.width;
+    const baseCost = volume * 0.01 + payload.weight * 2;
+    payload.deliveryFee = Math.round(baseCost * 100) / 100;
 
     if (payload.sender !== jwtUser.userId) {
         throw new AppError(httpStatus.BAD_REQUEST, 'Your are not Authorize!')
@@ -128,18 +130,23 @@ const updateParcelStatus = async (payload: updateParcelStatusParam) => {
 
 const receiverUserAllParcelInfo = async (userId: string, userRole: string) => {
     if (userRole === 'sender') {
-        const result = await ParcelModel.find({ sender: userId })
+        const result = await ParcelModel.find({ sender: userId }).populate('receiver')
         return result
     }
     if (userRole === 'receiver') {
-        const result = await ParcelModel.find({ receiver: userId })
+        const result = await ParcelModel.find({ receiver: userId }).populate('sender')
         return result
     }
 }
 
+const adminGetAllParcel = async () => {
+    const result = await ParcelModel.find().populate('sender').populate('receiver')
+    return result
+}
+
 const statusLog = async (parcelId: string) => {
-    const parcel = await ParcelModel.findById(parcelId).populate('statusLog.updatedBy', 'name email role note -_id').select('trackingId statusLog status')
-    console.log(parcel);
+    const parcel = await ParcelModel.findOne({ trackingId: parcelId }).populate('statusLog.updatedBy', 'name email role note -_id').select('trackingId statusLog status')
+
     if (!parcel) {
         throw new AppError(httpStatus.NOT_FOUND, 'Parcel not found')
     }
@@ -171,6 +178,7 @@ export const parcelService = {
     createParcel,
     updateParcelStatus,
     receiverUserAllParcelInfo,
+    adminGetAllParcel,
     statusLog,
     deleteParcel
 }

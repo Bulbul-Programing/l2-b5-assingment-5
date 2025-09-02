@@ -18,7 +18,9 @@ const parcel_service_1 = require("./parcel.service");
 const sendResponse_1 = require("../../utils/sendResponse");
 const http_status_codes_1 = __importDefault(require("http-status-codes"));
 const createParcel = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    const user = yield parcel_service_1.parcelService.createParcel(req.body, req.user);
+    const senderId = req.user.userId;
+    const payload = Object.assign(Object.assign({}, req.body), { sender: senderId });
+    const user = yield parcel_service_1.parcelService.createParcel(payload, req.user);
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         statusCode: http_status_codes_1.default.CREATED,
@@ -26,7 +28,7 @@ const createParcel = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(
         data: user,
     });
 }));
-const updateParcel = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+const updateParcel = (0, catchAsync_1.catchAsync)((req, res) => __awaiter(void 0, void 0, void 0, function* () {
     const parcelId = req.params.parcelId;
     const { status, note, isBlocked, rescheduledDate, returnReason } = req.body;
     const jwtUser = req.user;
@@ -59,6 +61,15 @@ const receiverIncomingParcel = (0, catchAsync_1.catchAsync)((req, res, next) => 
         data: result
     });
 }));
+const adminGetAllParcel = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield parcel_service_1.parcelService.adminGetAllParcel();
+    (0, sendResponse_1.sendResponse)(res, {
+        success: true,
+        statusCode: http_status_codes_1.default.CREATED,
+        message: "Parcel Retrieve Successfully",
+        data: result
+    });
+}));
 const statusLog = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     const parcelId = req.params.parcelId;
     const result = yield parcel_service_1.parcelService.statusLog(parcelId);
@@ -84,6 +95,7 @@ exports.parcelController = {
     createParcel,
     updateParcel,
     receiverIncomingParcel,
+    adminGetAllParcel,
     statusLog,
     deleteParcel
 };
