@@ -42,8 +42,18 @@ const login = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0,
     });
 }));
 const logout = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    res.clearCookie('accessToken');
-    res.clearCookie('refreshToken');
+    res.clearCookie('accessToken', {
+        httpOnly: true,
+        secure: true, // true if using HTTPS
+        sameSite: 'none', // matches the creation
+        path: '/' // matches the creation
+    });
+    res.clearCookie('refreshToken', {
+        httpOnly: true,
+        secure: true, // true if using HTTPS
+        sameSite: 'none', // matches the creation
+        path: '/' // matches the creation
+    });
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
         statusCode: http_status_codes_1.default.ACCEPTED,

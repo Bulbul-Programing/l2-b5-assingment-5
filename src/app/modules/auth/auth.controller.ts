@@ -36,8 +36,18 @@ const login = catchAsync(async (req: Request, res: Response, next: NextFunction)
 
 const logout = catchAsync(async (req: Request, res: Response, next: NextFunction) => {
 
-    res.clearCookie('accessToken')
-    res.clearCookie('refreshToken')
+    res.clearCookie('accessToken', {
+        httpOnly: true,
+        secure: true,       // true if using HTTPS
+        sameSite: 'none',   // matches the creation
+        path: '/'           // matches the creation
+    })
+    res.clearCookie('refreshToken', {
+        httpOnly: true,
+        secure: true,       // true if using HTTPS
+        sameSite: 'none',   // matches the creation
+        path: '/'           // matches the creation
+    })
 
     sendResponse(res, {
         success: true,
