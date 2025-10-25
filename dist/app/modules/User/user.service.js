@@ -43,7 +43,7 @@ const getReceiver = () => __awaiter(void 0, void 0, void 0, function* () {
     return result;
 });
 const getAllUsers = () => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield user_model_1.UserModel.find();
+    const result = yield user_model_1.UserModel.find().select({ _id: 1, name: 1, phone: 1, email: 1, address: 1, isBlocked: 1, role: 1 });
     return result;
 });
 exports.userService = {

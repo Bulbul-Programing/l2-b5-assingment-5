@@ -46,7 +46,7 @@ const getReceiver = async () => {
 }
 
 const getAllUsers = async () => {
-    const result = await UserModel.find()
+    const result = await UserModel.find().select({ _id: 1, name: 1, phone: 1, email: 1, address: 1, isBlocked : 1, role : 1 })
     return result
 }
 
