@@ -46,13 +46,24 @@ const getReceiver = async () => {
 }
 
 const getAllUsers = async () => {
-    const result = await UserModel.find().select({ _id: 1, name: 1, phone: 1, email: 1, address: 1, isBlocked : 1, role : 1 })
+    const result = await UserModel.find().select({ _id: 1, name: 1, phone: 1, email: 1, address: 1, isBlocked: 1, role: 1 })
     return result
+}
+
+const deleteUser = async (userId: string) => {
+    const isExistUser = await UserModel.findOne({ _id: userId })
+
+    if (!isExistUser) {
+        throw new AppError(404, "User not found!")
+    }
+
+    await UserModel.deleteOne({ _id: userId })
 }
 
 export const userService = {
     userRegister,
     updateUser,
     getReceiver,
-    getAllUsers
+    getAllUsers,
+    deleteUser
 }
