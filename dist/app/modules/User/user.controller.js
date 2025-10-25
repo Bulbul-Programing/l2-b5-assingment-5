@@ -47,8 +47,18 @@ const getReceiver = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(v
         data: result,
     });
 }));
+const getAllUsers = (0, catchAsync_1.catchAsync)((req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield user_service_1.userService.getAllUsers();
+    (0, sendResponse_1.sendResponse)(res, {
+        success: true,
+        statusCode: http_status_codes_1.default.CREATED,
+        message: "All users data retrieve Successfully",
+        data: result,
+    });
+}));
 exports.userController = {
     createUser,
     updateUser,
-    getReceiver
+    getReceiver,
+    getAllUsers
 };

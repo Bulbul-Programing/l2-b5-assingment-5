@@ -39,11 +39,16 @@ const updateUser = (userId, payload, jwtUserInfo) => __awaiter(void 0, void 0, v
     return updateUser;
 });
 const getReceiver = () => __awaiter(void 0, void 0, void 0, function* () {
-    const result = yield user_model_1.UserModel.find({ role: 'receiver' }).select({ _id: 1, name: 1, phone: 1 });
+    const result = yield user_model_1.UserModel.find({ role: 'receiver', isBlocked: false }).select({ _id: 1, name: 1, phone: 1 });
+    return result;
+});
+const getAllUsers = () => __awaiter(void 0, void 0, void 0, function* () {
+    const result = yield user_model_1.UserModel.find();
     return result;
 });
 exports.userService = {
     userRegister,
     updateUser,
-    getReceiver
+    getReceiver,
+    getAllUsers
 };
