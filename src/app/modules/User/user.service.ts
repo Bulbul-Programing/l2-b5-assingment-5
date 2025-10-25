@@ -40,14 +40,19 @@ const updateUser = async (userId: string, payload: Partial<TUser>, jwtUserInfo: 
 }
 
 const getReceiver = async () => {
-    const result = await UserModel.find({ role: 'receiver' }).select({ _id: 1, name: 1, phone : 1 })
+    const result = await UserModel.find({ role: 'receiver', isBlocked: false }).select({ _id: 1, name: 1, phone: 1 })
 
     return result
+}
 
+const getAllUsers = async () => {
+    const result = await UserModel.find()
+    return result
 }
 
 export const userService = {
     userRegister,
     updateUser,
-    getReceiver
+    getReceiver,
+    getAllUsers
 }

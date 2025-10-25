@@ -10,5 +10,6 @@ const router = Router()
 router.post('/register', validateRequest(createUserValidationSchema), userController.createUser)
 router.post('/update/:userId', checkAuth(...Object.values(Role)), validateRequest(updateUserValidationSchema), userController.updateUser)
 router.get('/receiver', checkAuth('admin', 'sender'), userController.getReceiver)
+router.get('/all-users', userController.getReceiver)
 
 export const UserRoutes = router
